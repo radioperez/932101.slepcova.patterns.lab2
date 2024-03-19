@@ -34,7 +34,7 @@ tk.Label(root, text="Welcome to ImageEditor 9000").pack()
 imgpane = tk.Frame(root)
 imgpane.pack(fill="both", expand=True)
 canvas = tk.Canvas(imgpane, bg="white", width=500, height=500)
-canvas.pack(fill="both", expand=True)
+canvas.pack(fill="both", expand=False)
 
 control = tk.Frame(root)
 control.pack()
