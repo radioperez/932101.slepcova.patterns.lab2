@@ -39,7 +39,7 @@ class ImageController:
             self.tkimage = ImageTk.PhotoImage(self.image)
             canvas.itemconfig(self.image_id, image=self.tkimage)
 
-class ImageControllerComplex(ImageController):
+class ImageControllerComplex:
     #imgData - encoded bytes
     #image - PIL image format
     #tkimage - TKinter compatibility layer
@@ -51,68 +51,65 @@ class ImageControllerComplex(ImageController):
         self.imgData = file.read()
         self.image = Image.open(BytesIO(self.imgData))
     def display(self):
-        super().display(self)     
+        if self.image != "":
+            canvas.delete("all")
+            IMSIZE = (self.image.width, self.image.height)
+            MAXSIZE = (int(canvas.winfo_width()), int(canvas.winfo_height()))
+            DISPLAYSIZE = (min(IMSIZE[0],MAXSIZE[0]),min(IMSIZE[1], MAXSIZE[1]))
+            self.image = self.image.resize(DISPLAYSIZE)
+            self.tkimage = ImageTk.PhotoImage(self.image)
+            self.image_id = canvas.create_image(0,0,image=self.tkimage, anchor="nw")     
     def flip(self, direction):
-        super().flip(self, direction)
+        dir = Image.FLIP_LEFT_RIGHT if direction == 0 else Image.FLIP_TOP_BOTTOM
+        if self.image_id != "":
+            self.image = self.image.transpose(dir)
+            self.tkimage = ImageTk.PhotoImage(self.image)
+            canvas.itemconfig(self.image_id, image=self.tkimage)
     def decreaseQuality(self):
-        super().decreaseQuality(self)
+        if self.image_id != "":
+            oldw, oldh = self.image.size
+            tempsize = (oldw // 4, oldh // 4)
+            self.image = self.image.resize(tempsize, Image.NEAREST)
+            self.image = self.image.resize((oldw, oldh))
+            self.tkimage = ImageTk.PhotoImage(self.image)
+            canvas.itemconfig(self.image_id, image=self.tkimage)
 
+controllerType = False
 def simple():
-    global controller
-    controller = ImageController
-    controller.open(controller)
-    controller.display(controller)
+    global controllerType
+    controllerType = True
+    global simplectr
+    simplectr = ImageController
+    simplectr.open(simplectr)
+    simplectr.display(simplectr)
+
 def notsimple():
-    global controller
-    controller = ImageControllerComplex
-    controller.open(controller)
-    controller.display(controller)
+    global controllerType
+    controllerType = False
+    global complexctr
+    complexctr = ImageControllerComplex
+    complexctr.open(complexctr)
+    complexctr.display(complexctr)
 
 def flip(direction):
-    if 'controller' in globals():
-        global controller
-        controller.flip(controller, direction)
-    else: 
+    if 'simplectr' in globals() and controllerType:
+        global simplectr
+        simplectr.flip(simplectr, direction)
+    elif 'complexctr' in globals() and not(controllerType):
+        global complexctr
+        complexctr.flip(complexctr, direction)
+    else:
         pass
 
 def quality():
-    if 'controller' in globals():
-        global controller
-        controller.decreaseQuality(controller)
+    if 'simplectr' in globals() and controllerType:
+        global simplectr
+        simplectr.decreaseQuality(simplectr)
+    elif 'complexctr' in globals() and not(controllerType):
+        global complexctr
+        complexctr.decreaseQuality(complexctr)
     else:
         pass
-
-######### Без паттерна
-controllerType = False
-def simple_():
-    global controllerType
-    controllerType = False
-    global controller
-    controller = ImageController
-    controller.open(controller)
-    controller.display(controller)
-
-def notsimple_():
-    global controllerType
-    controllerType = True
-    global controller
-    controller = ImageControllerComplex
-    controller.open(controller)
-    controller.display(controller)
-
-def flip_(direction):
-    if controllerType:
-        controller.flip(controller, direction)
-    else:
-        controller.flip(controller, direction)
-
-def quality_():
-    if controllerType:
-        controller.quality(controller)
-    else:
-        controller.quality(controller)
-#########
-
 
 root = tk.Tk()
 root.geometry("1000x1000")
