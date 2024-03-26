@@ -82,38 +82,6 @@ def quality():
     else:
         pass
 
-######### Без паттерна
-controllerType = False
-def simple_():
-    global controllerType
-    controllerType = False
-    global controller
-    controller = ImageController
-    controller.open(controller)
-    controller.display(controller)
-
-def notsimple_():
-    global controllerType
-    controllerType = True
-    global controller
-    controller = ImageControllerComplex
-    controller.open(controller)
-    controller.display(controller)
-
-def flip_(direction):
-    if controllerType:
-        controller.flip(controller, direction)
-    else:
-        controller.flip(controller, direction)
-
-def quality_():
-    if controllerType:
-        controller.quality(controller)
-    else:
-        controller.quality(controller)
-#########
-
-
 root = tk.Tk()
 root.geometry("1000x1000")
 root.title("ImageEditor 9000")
